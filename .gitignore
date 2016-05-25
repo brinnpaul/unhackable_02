@@ -1,0 +1,5 @@
+node_modules/
+bower_components/
+server/auth/*.txt
+server/secretsdatabase.txt
+server/app/secrets.router.txt
