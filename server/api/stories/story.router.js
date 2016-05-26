@@ -28,14 +28,17 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  Story.create(req.body)
-  .then(function (story) {
-    return story.reload({include: [{model: User, as: 'author'}]});
-  })
-  .then(function (includingAuthor) {
-    res.status(201).json(includingAuthor);
-  })
-  .catch(next);
+  if(req.user) {
+    Story.create(req.body)
+    .then(function (story) {
+      return story.reload({include: [{model: User, as: 'author'}]});
+    })
+    .then(function (includingAuthor) {
+      res.status(201).json(includingAuthor);
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 router.get('/:id', function (req, res, next) {
@@ -47,19 +50,25 @@ router.get('/:id', function (req, res, next) {
 });
 
 router.put('/:id', function (req, res, next) {
-  req.story.update(req.body)
-  .then(function (story) {
-    res.json(story);
-  })
-  .catch(next);
+  if(req.user.id === req.params.id || req.user.isAdmin) {
+    req.story.update(req.body)
+    .then(function (story) {
+      res.json(story);
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 router.delete('/:id', function (req, res, next) {
-  req.story.destroy()
-  .then(function () {
-    res.status(204).end();
-  })
-  .catch(next);
+  if(req.user.id === req.params.id || req.user.isAdmin) {
+    req.story.destroy()
+    .then(function () {
+      res.status(204).end();
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 module.exports = router;

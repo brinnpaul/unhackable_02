@@ -17,19 +17,25 @@ router.param('id', function (req, res, next, id) {
 });
 
 router.get('/', function (req, res, next) {
-  User.findAll({})
-  .then(function (users) {
-    res.json(users);
-  })
-  .catch(next);
+  if(req.user) {
+    User.findAll({})
+    .then(function (users) {
+      res.json(users);
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 router.post('/', function (req, res, next) {
-  User.create(req.body)
-  .then(function (user) {
-    res.status(201).json(user);
-  })
-  .catch(next);
+  if(req.users.isAdmin) {
+    User.create(req.body)
+    .then(function (user) {
+      res.status(201).json(user);
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 router.get('/:id', function (req, res, next) {
@@ -41,19 +47,25 @@ router.get('/:id', function (req, res, next) {
 });
 
 router.put('/:id', function (req, res, next) {
-  req.requestedUser.update(req.body)
-  .then(function (user) {
-    res.json(user);
-  })
-  .catch(next);
+  if(req.user.id === req.params.id || req.user.isAdmin) {
+    req.requestedUser.update(req.body)
+    .then(function (user) {
+      res.json(user);
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 router.delete('/:id', function (req, res, next) {
-  req.requestedUser.destroy()
-  .then(function () {
-    res.status(204).end();
-  })
-  .catch(next);
+  if(req.user.id === req.params.id || req.user.isAdmin) {
+    req.requestedUser.destroy()
+    .then(function () {
+      res.status(204).end();
+    })
+    .catch(next);
+  }
+  else res.sendStatus(403)
 });
 
 module.exports = router;

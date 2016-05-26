@@ -8,7 +8,6 @@ var rootPath = path.join(__dirname, '..');
 
 var db_password = fs.readFileSync(rootPath+'/server/secretsdatabase.txt', 'utf8').trim()
 
-console.log(db_password)
 var db = new Sequelize('auther', 'bpr', db_password, {
   dialect: 'postgres',
   port: 5432,
